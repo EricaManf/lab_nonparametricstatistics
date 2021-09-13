@@ -12,5 +12,4 @@ installed via the following commands:
 install.packages(c("here", "remotes", "rmarkdown", "knitr", "rgl", "hexbin", "packagefinder", "dplyr", "ggplot2", "broom")) # general-purpose packages
 install.packages(c("DepthProc", "aplpack", "robustbase", "roahd")) # depth measures packages
 install.packages(c("survival", "survminer")) # survival analysis packages
-install.packages("np") # nonparametric regression packages
 ```
