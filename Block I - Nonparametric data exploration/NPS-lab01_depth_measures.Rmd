@@ -1,6 +1,6 @@
 ---
 title: "Lab 01 - Depth measures"
-date: 2021/09/XX
+date: 2021/09/22
 author: "Nonparametric statistics ay 2021/2022"
 output:
   
@@ -20,6 +20,12 @@ editor_options:
 library(rgl)
 knitr::opts_chunk$set(echo = TRUE)
 knitr::knit_hooks$set(webgl = hook_webgl)
+```
+
+```{css, echo=FALSE}
+.extracode {
+background-color: lightblue;
+}
 ```
 
 *Disclaimer 1: The present material is an adaptation of the original R
@@ -143,7 +149,7 @@ class:
 
 $${M}_{h}D({F;X} ^ {n}) = \frac{ 1 }{ 1 + {{(x - \mu_F)} ^ {T}}{{\Sigma} ^ {-1}}(x - \mu_F) }$$
 
-```{r}
+```{r, class.source="extracode"}
 sample_mean <- colMeans(df_bivariate_exp)
 sample_S <- cov(df_bivariate_exp)
 
@@ -154,7 +160,7 @@ maha_depth_manual <- 1/(1+mahalanobis(x = df_bivariate_exp,center = sample_mean,
 And check that the obtained result is equal to the one obtained via the
 `depth` function
 
-```{r}
+```{r, class.source="extracode"}
 all(abs(maha_depth-maha_depth_manual)<1e-15) # food for thought: sqrt(2) ^ 2 == 2?
 ```
 
@@ -415,7 +421,7 @@ ddPlot(x = df_good,y = df_out,depth_params = list(method='Tukey'))
 
 It is easy to manually build a DD-plot
 
-```{r}
+```{r, class.source="extracode"}
 depth_good <- depth(u = df_3,X = df_good,method = "Tukey")
 depth_out <- depth(u = df_3,X = df_out,method = "Tukey")
 plot(depth_good,depth_out, col="blue", xlab="X depth", ylab="Y depth", main= "Depth vs. depth plot")
