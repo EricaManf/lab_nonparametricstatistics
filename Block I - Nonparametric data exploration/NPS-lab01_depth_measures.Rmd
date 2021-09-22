@@ -276,7 +276,7 @@ bagplot_cont_normals <- bagplot(df_contaminated_normals)
 outlying_obs <- bagplot_cont_normals$pxy.outlier
 ```
 
-Once the outlying units have been identifiend, one can discard them from
+Once the outlying units have been identified, one can discard them from
 the original data and keep working on the clean subset only. There are
 several ways to do this.
 
