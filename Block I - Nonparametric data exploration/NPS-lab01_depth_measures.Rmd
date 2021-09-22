@@ -38,7 +38,7 @@ be present in this document.*
 intermediate R users, if this is not the case please let me know, and we
 shall find a solution together*
 
-## Loading necessay libraries
+## Loading necessary libraries
 
 ```{r message=FALSE, warning=FALSE}
 library(MASS)
