@@ -1,0 +1,42 @@
+---
+title: "Lab 08 - Bootstrapping"
+date: 2021/10/23
+author: "Nonparametric statistics ay 2021/2022"
+output:
+  
+  html_document: 
+    df_print: paged
+  pdf_document: default
+  html_notebook: 
+    df_print: paged
+  word_document: default
+editor_options: 
+  chunk_output_type: inline
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+library(rgl)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::knit_hooks$set(webgl = hook_webgl)
+```
+
+```{css, echo=FALSE}
+.extracode {
+background-color: lightblue;
+}
+```
+
+*Disclaimer: The present material has been slightly adapted from the original R
+script prepared by me for the a.y. 2020/2021
+Nonparametric statistics course. I hereby assume responsibility for any error that may
+be present in this document, I do apologise for them and invite you to let me know.*
+
+
+```{r}
+
+seed=2781991
+B=1000
+```
+
