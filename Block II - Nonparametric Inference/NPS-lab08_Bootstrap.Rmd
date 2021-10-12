@@ -33,6 +33,7 @@ script prepared by me for the a.y. 2020/2021
 Nonparametric statistics course. I hereby assume responsibility for any error that may
 be present in this document, I do apologise for them and invite you to let me know.*
 
+<<<<<<< HEAD
 ```{r}
 
 seed=2781991
@@ -171,5 +172,12 @@ plot(age,circumference,main='Fitted curve vs data',xlim=c(0,2500),ylim=c(20,200)
 lines(age_fine,circumference_fine,col='red')
 abline(h=L.obs, lty=2)
 abline(h = CI.RP.L)
+=======
+
+```{r}
+
+seed=2781991
+B=1000
+>>>>>>> 7a08388f2cbbc8517ffd111cd955696f042f2db1
 ```
 
