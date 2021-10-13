@@ -49,6 +49,7 @@ This lab would be indeed more complex from a computational point of view than a 
 Let's simulate some data...
 
 ```{r}
+set.seed(seed)
 data=stabledist::rstable(1000,1.5,0)
 hist(data)
 median(data)
@@ -69,7 +70,7 @@ To do so I use a 1 population test on symmetric distributions, where my permutat
 uni_t_perm=function(data,mu0,B=1000){
 
 data_trans=data-mu0
-T0=abs(mean(data_trans))
+T0=abs(median(data_trans))
 T_perm=numeric(B)
 n=length(data)
 
@@ -113,7 +114,7 @@ So, let's create a cluster with 16 cores!
 
 ```{r}
 
-cl=makeCluster(detectCores())
+cl=makeCluster(16)
 
 ```
 
