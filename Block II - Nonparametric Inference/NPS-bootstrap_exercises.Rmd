@@ -1,0 +1,367 @@
+---
+title: "Exercises on Nonparametric Inference"
+date: 2021/10/22
+author: "Nonparametric statistics ay 2021/2022"
+output:
+  
+  html_document: 
+    df_print: paged
+  pdf_document: default
+  html_notebook: 
+    df_print: paged
+  word_document: default
+editor_options: 
+  chunk_output_type: inline
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+library(rgl)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::knit_hooks$set(webgl = hook_webgl)
+```
+
+```{css, echo=FALSE}
+.extracode {
+background-color: lightblue;
+}
+```
+
+#Problem 1 
+
+The local administration of Torgnon, a small municipality in Aosta Valley, has given you the task
+to assess the probability of a flood coming from the small river that crosses the village.
+To do so, they given you data about the maximum water level (in metres) of the past 50 years.
+The major is only willing to accept a 5% probability of flood. so your wall should be high at least
+as the 95th percentile of the maximums distribution.
+
+1. Assess the statistical quality of the sample 95th percentile, and compute a 95 percent confidence
+interval for it
+
+2. After some study, you've discovered that the maximum value of level of water is usually distributed
+as a lognormal: How can you use this information? Has your estimate of the sample 95th percentile improved?
+
+#Solution
+
+Let's read and plot the data, so we understand a bit the situation
+```{r}
+load('water_level_data/water_level.rda')
+
+hist(water_level)
+boxplot(water_level)
+```
+
+To assess the quality and compute a confidence interval, the way to go is by bootstrapping, so
+
+```{r}
+B <- 10000
+water.obs=water_level
+
+q95.obs=quantile(water.obs,0.95)
+q95.boot = numeric(B)
+for(b in 1:B)
+{
+  water.b <- sample(water.obs, replace = T)
+  q95.boot[b] = quantile(water.b,0.95)
+}
+```
+
+Let's plot the ecdf
+
+```{r}
+plot(ecdf(q95.boot))
+abline(v = q95.obs)
+```
+
+To assess the quality of the estimation what you need to provide are the bootstrap variance, the bias, and with those you can easily estimate the RMSE
+
+```{r}
+var=var(q95.boot)
+bias=mean(q95.boot)-q95.obs
+names(bias)=''
+RMSE=sqrt(var+bias^2)
+var
+bias
+RMSE
+```
+
+For a CI,let's use classic reverse percentile intervals.
+
+```{r}
+alpha <- 0.05
+
+right.quantile <- quantile(q95.boot, 1 - alpha/2)
+left.quantile  <- quantile(q95.boot, alpha/2)
+
+CI.RP <- c(q95.obs - (right.quantile - q95.obs), q95.obs, q95.obs - (left.quantile - q95.obs))
+names(CI.RP)=c('lwr','lvl','upr')
+```
+
+to solve the second part, we understand that we can use a parametric bootstrap.
+We need to fit a lognormal to our data, and then run bootstrap simulations out of it... but how to estimate the parameters of a lognormal? How can I do it? It's easy peasy...
+
+```{r}
+norm_water_level=log(water_level)
+hist(norm_water_level)
+shapiro.test(norm_water_level)
+```
+
+
+The log of my data is normal... as the they come from a lognormal distribution.
+So how can I generate from such distirbution?
+
+```{r}
+mean=mean(norm_water_level)
+sd=sqrt(var(norm_water_level))
+n=length(norm_water_level)
+
+q95.boot.p = numeric(B)
+
+for(b in 1:B)
+{
+  water.b <- exp(rnorm(n,mean,sd))
+  q95.boot.p[b] = quantile(water.b,0.95)
+}
+```
+
+Let's plot the ecdf
+
+```{r}
+plot(ecdf(q95.boot.p))
+abline(v = q95.obs)
+```
+
+and, let's compute the performance of parametric bootstrap, and then compare them to the nonparametric case
+
+```{r}
+plot(ecdf(q95.boot.p))
+abline(v = q95.obs)
+
+
+var.p=var(q95.boot.p)
+bias.p=mean(q95.boot.p)-q95.obs
+RMSE.p=sqrt(var.p+bias.p^2)
+
+var=var(q95.boot)
+bias=mean(q95.boot)-q95.obs
+RMSE=sqrt(var+bias^2)
+
+data.frame("Non Parametric"=c(var,bias,RMSE),"Parametric"=c(var.p,bias.p,RMSE.p))
+```
+We can of course compute a confidence interval with the classical reverse quantile strategy
+
+```{r}
+alpha <- 0.05
+
+right.quantile <- quantile(q95.boot.p, 1 - alpha/2)
+left.quantile  <- quantile(q95.boot.p, alpha/2)
+
+CI.RP.p <- c(q95.obs - (right.quantile - q95.obs), q95.obs, q95.obs - (left.quantile - q95.obs))
+CI.RP.p
+```
+
+
+#Problem 2 
+The chief coach of the Aosta ski club has tasked you to select who, among its three top-class athletes in alpine skiing, can successfully compete also in ski-cross races, which have been recently "promoted" to
+an alpine discipline from its former "freestyle" status. 
+One of the key areas in ski-cross is the moment when the athlete "jumps" in the track: this, differently from alpine skiing, happens after the blow of a whistle. For this reason, fast reaction times can make the difference between losing and winning.
+You're so given the data about 100 "start" trials for the three athletes, stored in "parallel_gate.rda"
+The chief coach is asking if:
+1. Are there any differences among the athletes? (see if you can use a parametric approach, if not, use a permutational one)
+2. From a preliminary visual analysis, athlete 3 seems the best: how can you assess this, knowing what you discovered in 1.?
+3. The coach is also asking you an idea of the "consistency" of athlete 3 out of the gate: provide him with a confidence interval for the mean of his reaction time.
+
+#Solution
+
+Let's load the data, and plot it, after having converted the athlete variable to a factor.
+
+```{r}
+#load the data
+load('parallel_gate_data/parallel_gate.rda')
+head(chrono)
+
+#convert athlete to factor
+chrono$athlete=factor(chrono$athlete)
+summary(chrono)
+attach(chrono)
+boxplot(reaction_time ~ athlete)
+```
+Let's assess if I can use classical ANOVA
+
+```{r}
+model_norm=aov(reaction_time ~ athlete)
+summary(model_norm)
+shapiro.test(model_norm$residuals)
+qqnorm(model_norm$residuals)
+abline(a=0,b=1,col='red')
+```
+
+normality is not verified, let's go permutational
+
+```{r}
+T0 <- summary(model_norm)[[1]][1,4]
+
+T0
+
+B <- 1000 # Number of permutations
+T_stat <- numeric(B) 
+n <- nrow(chrono) 
+  
+  for(perm in 1:B){
+    # Permutation:
+    permutation <- sample(1:n)
+    reaction_perm <- reaction_time[permutation]
+    model_perm <- aov(reaction_perm ~ athlete)
+    
+    # Test statistic:
+    T_stat[perm] <- summary(model_perm)[[1]][1,4]
+  }
+
+
+hist(T_stat,xlim=range(c(T_stat,T0)),breaks=30)
+abline(v=T0,col=3,lwd=2)
+
+plot(ecdf(T_stat),xlim=range(c(T_stat,T0)))
+abline(v=T0,col=3,lwd=4)
+```
+
+```{r}
+# p-value
+p_val <- sum(T_stat>=T0)/B
+p_val
+```
+
+P-Value is zero, so you have a statistically significant difference between athlethes.
+To answer the next point, you need to perform a proper post hoc test.
+Tet's go with two permutational t-tests, using as a reference level 3 (the best candidate) to be the fastest out of the gate.
+We start with 3 vs 1
+
+```{r}
+pooled1=chrono[athlete!=2,]
+n1=nrow(pooled1)
+ath_3=pooled1$athlete==3
+T0=abs(mean(pooled1$reaction_time[ath_3])-mean(pooled1$reaction_time[!ath_3]))
+
+
+
+
+T_stat=numeric(B)
+for(perm in 1:B){
+  # permutation:
+  permutation <- sample(1:n1)
+  time_perm <- pooled1$reaction_time[permutation]
+  ref_perm <- time_perm[ath_3]
+  other_perm <- time_perm[!ath_3]
+  # test statistic:
+  T_stat[perm] <- abs(mean(other_perm) - mean(ref_perm))
+}
+
+p_val <- sum(T_stat>=T0)/B
+p_val
+
+```
+
+Now 3 vs 2
+
+```{r}
+pooled2=chrono[athlete!=1,]
+n2=nrow(pooled2)
+ath_3=pooled2$athlete==3
+T0=abs(mean(pooled2$reaction_time[ath_3])-mean(pooled2$reaction_time[!ath_3]))
+
+
+
+
+T_stat=numeric(B)
+for(perm in 1:B){
+  # permutation:
+  permutation <- sample(1:n1)
+  time_perm <- pooled1$reaction_time[permutation]
+  ref_perm <- time_perm[ath_3]
+  other_perm <- time_perm[!ath_3]
+  # test statistic:
+  T_stat[perm] <- abs(mean(other_perm) - mean(ref_perm))
+}
+
+p_val <- sum(T_stat>=T0)/B
+p_val
+
+```
+
+To solve the third point, you can either choose a permutational or a bootstrap approach, let's start with the permutational one
+
+```{r}
+uni_t_perm=function(data,mu0,B=1000){
+  
+  data_trans=data-mu0
+  T0=abs(mean(data_trans))
+  T_perm=numeric(B)
+  n=length(data)
+  
+  for(perm in 1:B){
+    
+    refl <- rbinom(n, 1, 0.5)*2 - 1
+    T_perm[perm]=abs(mean(data_trans*refl))
+    
+  }
+  return(sum(T_perm>=T0)/B)
+}
+
+library(pbapply)
+library(parallel)
+
+
+grid=seq(0,2,by=0.001)
+
+cl=makeCluster(2)
+ath_3=reaction_time[athlete==3]
+
+
+clusterExport(cl,varlist=list("ath_3","uni_t_perm"))
+
+mean(ath_3)
+
+perm_wrapper=function(grid_point){uni_t_perm(ath_3,grid_point)}
+pval_function=pbsapply(grid,perm_wrapper,cl=cl)
+pval_function
+plot(grid,pval_function,type='l')
+
+range(grid[pval_function>0.05])
+abline(v=range(grid[pval_function>0.05]))
+```
+
+Here is the (simpler...) bootstrap solution
+
+```{r}
+#the part could've been equivalently solved by using a bootstrap approach:
+
+
+T0=mean(ath_3)
+B=1000
+T.boot=numeric(B)
+
+for(b in 1:B)
+{
+  x.b <- sample(ath_3, replace = T)
+  T.boot[b] <- mean(x.b)
+}
+
+# RP intervals
+
+alpha <- 0.05
+
+right.quantile <- quantile(T.boot, 1 - alpha/2)
+left.quantile  <- quantile(T.boot, alpha/2)
+
+T0
+right.quantile - T0
+left.quantile  - T0
+
+CI.RP <- c(T0 - (right.quantile - T0), T0 - (left.quantile - T0))
+CI.RP
+range(grid[pval_function>0.05])
+
+```
+
+

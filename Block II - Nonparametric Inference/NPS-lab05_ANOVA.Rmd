@@ -51,7 +51,8 @@ Let's import and summarise the dataset
 
 
 ```{r}
-head(chickwts)
+
+chickwts
 attach(chickwts)
 summary(chickwts)
 ```
@@ -160,6 +161,7 @@ We use the Iris dataset
 data(iris)
 attach(iris)
 head(iris)
+table(iris$Species)
 ```
 let's arrange it a bit, and plot it.
 
@@ -182,7 +184,7 @@ g  <- length(levels(species.name))
 p  <- 4
 ```
 
-How to perform a MANOVA test? instead of using the F-test, we will develop a test based on a "permutationalisation of the Wilks test.
+How to perform a MANOVA test? instead of using the F-test, we will develop a test based on a "permutationalisation" of the Wilks test.
 Lets compute the permutational test statistic
 
 ```{r}
@@ -231,7 +233,7 @@ Up to now, everything is fairly easy. The situation gets a bit uglier when more 
 In this case we wan to test the efficiency of a car with different fuels, which are classified by their producer or by their octane number
 I want to see what are the meaningful factors in determining the number of kms performed with a litre of petrol, interaction included...
 
-This time the data is put in by hadnd...
+This time the data is put in by hand...
 
 ```{r}
 km          <- c(18.7, 16.8, 20.1, 22.4, 14.0, 15.2, 22.0, 23.3)
@@ -258,7 +260,7 @@ and, of course, I can do everything in a fully parametric setting...
 
 ```{r}
 # Parametric test:
-summary.aov(aov(km ~ station + fuel + station:fuel))
+summary(aov(km ~ station + fuel + station:fuel))
 # Without interaction
 summary.aov(aov(km ~ station + fuel))
 # Without station
@@ -292,7 +294,7 @@ and instead compute the permutational distribution:
 aov.H0station_fuel <- aov(km ~ station + fuel)
 aov.H0station_fuel
 residuals.H0station_fuel <- aov.H0station_fuel$residuals
-n <- 8
+n = 8
 
 
 T_station_fuel <- numeric(B)
