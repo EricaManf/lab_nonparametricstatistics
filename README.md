@@ -10,8 +10,10 @@ installed via the following commands:
 
 ``` r
 install.packages(c("here", "remotes", "rmarkdown", "knitr", "rgl", "hexbin", "packagefinder", "dplyr", "ggplot2","broom","progress")) # general-purpose packages
-install.packages('lmPerm') #permutation package
 install.packages('pbapply')#parallel computing package
+install.packages('ISLR2', 'car') # packages containing useful datasets
 install.packages(c("DepthProc", "aplpack", "robustbase", "roahd")) # depth measures packages
+install.packages('lmPerm') #permutation package
+install.packages('np', 'splines', 'fda', 'mgcv', 'gam') # non parametric regression packages
 install.packages(c("survival", "survminer")) # survival analysis packages
 ```
