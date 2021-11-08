@@ -83,7 +83,9 @@ lines(income_newdata$income,preds$fit ,lwd =2, col =" blue")
 matlines(income_newdata$income,se.bands ,lwd =1, col =" blue",lty =3)
 ```
 
-This can be manually implemented in a straightforward way. Spoiler alert: the code below is very bad in terms of efficiency, it is only shown for didactic purposes!
+This can be manually implemented in a straightforward way. Spoiler
+alert: the code below is very bad in terms of efficiency and portability, it is only
+shown for didactic purposes!
 
 ```{r, class.source="extracode"}
 loc_pred_unif_manual <- Vectorize(function(x_0, bw) {
@@ -93,7 +95,6 @@ loc_pred_unif_manual <- Vectorize(function(x_0, bw) {
   
   Prestige %>%
     dplyr::slice(ind_unit_in_bw) %>%
-    # dplyr::distinct(prestige) %>%
     dplyr::summarise(mean(prestige)) %>%
     dplyr::pull()
   
@@ -107,7 +108,6 @@ preds <- predict(m_loc, newdata=data.frame(income=Prestige$income))
 all(dplyr::near(preds, loc_pred_unif_manual(x_0 = Prestige$income,bw = 3200), tol = 1e-13))
 
 ```
-
 
 Let us try to decrease the bandwidth
 
@@ -187,7 +187,8 @@ lines(income_newdata$income,preds$fit ,lwd =2, col =" blue")
 matlines(income_newdata$income,se.bands ,lwd =1, col =" blue",lty =3)
 ```
 
-Notice that the same results could be achieved by means of the `locpoly` function in the `KernSmooth` package:
+Notice that the same results could be achieved by means of the `locpoly`
+function in the `KernSmooth` package:
 
 ```{r, class.source="extracode"}
 m_kern_smooth <- with(Prestige,KernSmooth::locpoly(x = income, y = prestige, bandwidth = 3200, degree = 0,
@@ -246,7 +247,10 @@ lines(income_newdata$income,preds$fit ,lwd =2, col =" blue")
 matlines(income_newdata$income,se.bands ,lwd =1, col =" blue",lty =3)
 ```
 
-Last note: a very nice interactive visualization on how local regression works is available [here](https://bookdown.org/egarpor/PM-UC3M/npreg-kre.html#npreg-kre-locpoly) (Figure 6.6). 
+Last note: a very nice interactive visualization on how local regression
+works is available
+[here](https://bookdown.org/egarpor/PM-UC3M/npreg-kre.html#npreg-kre-locpoly)
+(Figure 6.6).
 
 ### Exercise
 
@@ -351,7 +355,8 @@ model_linear_spline=coef(model_linear_spline))
 The reason is due to the different set of basis used to represent the
 space of spline functions: the former employs a conceptually simple (and
 easy to code) truncated power basis, whereas the latter uses a
-computationally more efficient B-spline basis (more on this later in the lab).
+computationally more efficient B-spline basis (more on this later in the
+lab).
 
 Flexibility? The sky is the limit here. Let us build a piecewise linear
 spline
@@ -402,8 +407,8 @@ I can either specify the knots (as done so far), or have R automatically
 select the spacing, I just need to specify their number knowing that:
 $$\#dof = \#knots + degree$$
 
-Example: if we want $4$ knots and a cubic
-spline, we will end up with $7$ degrees of freedom.
+Example: if we want $4$ knots and a cubic spline, we will end up with
+$7$ degrees of freedom.
 
 ```{r}
 model_cubic_splines_2 <-
@@ -547,9 +552,13 @@ is, we aim at minimizing
 \end{equation}
 ```
 This is operationally done by performing a penalized regression over the
-natural spline basis, placing knots at all the inputs. This means that, remarkably, the problem defined on an infinite-dimensional function space has a finite-dimensional, unique minimizer which is a natural cubic spline! The this result is not even difficult to prove (see Theorem 2.3 of Nonparametric Regression and Generalized Linear Models: A Roughness Penalty Approach by Green and Silverman)
-This is automatically performed in R through the `smooth.spline`
-function.
+natural spline basis, placing knots at all the inputs. This means that,
+remarkably, the problem defined on an infinite-dimensional function
+space has a finite-dimensional, unique minimizer which is a natural
+cubic spline! The this result is not even difficult to prove (see
+Theorem 2.3 of Nonparametric Regression and Generalized Linear Models: A
+Roughness Penalty Approach by Green and Silverman) This is automatically
+performed in R through the `smooth.spline` function.
 
 ```{r}
 fit_smooth_spline <- with(Prestige, smooth.spline(income,prestige,df=100))
@@ -593,7 +602,8 @@ or the GCV error
 \end{equation}
 ```
 where $\boldsymbol{A}$ is the hat matrix of the associated regression
-problem (see e.g., Section 5.4.1 of The Elements of Statistical Learning by Hastie, Tibshirani and Friedman for further explanation).
+problem (see e.g., Section 5.4.1 of The Elements of Statistical Learning
+by Hastie, Tibshirani and Friedman for further explanation).
 
 ```{r}
 fit_smooth_spline_CV <- with(Prestige, smooth.spline(income,prestige,cv = TRUE))
