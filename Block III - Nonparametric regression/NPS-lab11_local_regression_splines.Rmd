@@ -555,7 +555,7 @@ This is operationally done by performing a penalized regression over the
 natural spline basis, placing knots at all the inputs. This means that,
 remarkably, the problem defined on an infinite-dimensional function
 space has a finite-dimensional, unique minimizer which is a natural
-cubic spline! The this result is not even difficult to prove (see
+cubic spline! This result is not even difficult to prove (see
 Theorem 2.3 of Nonparametric Regression and Generalized Linear Models: A
 Roughness Penalty Approach by Green and Silverman) This is automatically
 performed in R through the `smooth.spline` function.
