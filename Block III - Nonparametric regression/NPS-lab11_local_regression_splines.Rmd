@@ -84,8 +84,8 @@ matlines(income_newdata$income,se.bands ,lwd =1, col =" blue",lty =3)
 ```
 
 This can be manually implemented in a straightforward way. Spoiler
-alert: the code below is very bad in terms of efficiency and portability, it is only
-shown for didactic purposes!
+alert: the code below is very bad in terms of efficiency and
+portability, it is only shown for didactic purposes!
 
 ```{r, class.source="extracode"}
 loc_pred_unif_manual <- Vectorize(function(x_0, bw) {
@@ -555,8 +555,8 @@ This is operationally done by performing a penalized regression over the
 natural spline basis, placing knots at all the inputs. This means that,
 remarkably, the problem defined on an infinite-dimensional function
 space has a finite-dimensional, unique minimizer which is a natural
-cubic spline! This result is not even difficult to prove (see
-Theorem 2.3 of Nonparametric Regression and Generalized Linear Models: A
+cubic spline! This result is not even difficult to prove (see Theorem
+2.3 of Nonparametric Regression and Generalized Linear Models: A
 Roughness Penalty Approach by Green and Silverman) This is automatically
 performed in R through the `smooth.spline` function.
 
@@ -609,7 +609,7 @@ by Hastie, Tibshirani and Friedman for further explanation).
 fit_smooth_spline_CV <- with(Prestige, smooth.spline(income,prestige,cv = TRUE))
 fit_smooth_spline_GCV <- with(Prestige, smooth.spline(income,prestige,cv = FALSE))
 with(Prestige, plot(income ,prestige, cex =.5, col =" darkgrey "))
-lines(fit_smooth_spline,col="red",lwd=2,lty=1)
+lines(fit_smooth_spline_CV,col="red",lwd=2,lty=1)
 lines(fit_smooth_spline_GCV,col="blue",lwd=2, lty=2)
 legend(20000, 30, legend=c("CV", "GCV"),
        col=c("red", "blue"), lty=1:2, cex=0.8)
