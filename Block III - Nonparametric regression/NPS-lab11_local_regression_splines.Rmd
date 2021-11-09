@@ -405,7 +405,7 @@ matlines(new_data$income, se.bands ,lwd =1, col =" blue",lty =3)
 
 I can either specify the knots (as done so far), or have R automatically
 select the spacing, I just need to specify their number knowing that:
-$$\#dof = \#knots + degree$$
+$$dof = \#knots + degree$$
 
 Example: if we want $4$ knots and a cubic spline, we will end up with
 $7$ degrees of freedom.
