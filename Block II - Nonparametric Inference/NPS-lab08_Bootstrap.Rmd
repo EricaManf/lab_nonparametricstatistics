@@ -172,8 +172,8 @@ plot(age,circumference,main='Fitted curve vs data',xlim=c(0,2500),ylim=c(20,200)
 lines(age_fine,circumference_fine,col='red')
 abline(h=L.obs, lty=2)
 abline(h = CI.RP.L)
-=======
 
+#ha modificato alcuni codici prima=> riguarda registrazione
 ```{r}
 
 seed=2781991
